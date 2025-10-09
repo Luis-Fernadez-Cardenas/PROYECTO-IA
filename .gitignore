@@ -1,0 +1,26 @@
+# --- ENTORNOS VIRTUALES ---
+.venv/
+venv/
+env/
+
+# --- CACHES Y ARCHIVOS TEMPORALES ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.tmp
+*.bak
+
+# --- CONFIGURACIONES DEL IDE ---
+.idea/
+.vscode/
+
+# --- RESULTADOS Y SALIDAS ---
+outputs/
+results/
+plots/
+reports/
+
+# --- CHECKPOINTS DE NOTEBOOKS ---
+.ipynb_checkpoints/
