@@ -57,3 +57,8 @@ plt.show()
 # print("Forma de los datos:", senial.shape)
 # print("\nPrimeras 10 muestras (valores crudos):")
 # print(senial[:10])
+
+def cargar_datos(ruta):
+    with open(ruta + ".dat","r") as f:
+        datos = wfdb.read()
+    return datos
