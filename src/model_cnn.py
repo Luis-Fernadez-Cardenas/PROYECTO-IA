@@ -1,5 +1,5 @@
 
-def crear_medelo():
+def crear_modelo():
     ## Definimos el modelo
     modelo = {}
     return modelo
