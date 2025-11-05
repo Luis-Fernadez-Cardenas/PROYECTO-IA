@@ -3,22 +3,12 @@ import wfdb
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
 # Ruta SIN extensión (.dat y .hea deben estar en la misma carpeta)
 ruta = r"D:\PROYECTO-IA\data\raw\00001_hr"
-
 
 # Graficar varias derivaciones
 lead = 1  # por ejemplo la derivación II
 plt.figure(figsize=(12, 4))
-
-#print(df.head(100))
-
-# print("Frecuencia de muestreo:", fs, "Hz")
-# print("Derivaciones:", derivaciones)
-# print("Forma de los datos:", senial.shape)
-# print("\nPrimeras 10 muestras (valores crudos):")
-# print(senial[:10])
 
 def cargar_datos(ruta):
     record = wfdb.rdrecord(ruta)
