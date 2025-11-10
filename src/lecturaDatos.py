@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Ruta SIN extensión (.dat y .hea deben estar en la misma carpeta)
-ruta = r"D:\PROYECTO-IA\data\raw\00001_hr"
-
+#ruta = r"D:\PROYECTO-IA\data\raw\00001_hr"
+ruta = r"D:\PROYECTO-IA\data\raw\records500\00000\00001_hr"
 # Graficar varias derivaciones
 lead = 1  # por ejemplo la derivación II
 plt.figure(figsize=(12, 4))
