@@ -1,7 +1,7 @@
-import numpy as np
+
 import wfdb
 import matplotlib.pyplot as plt
-import pandas as pd
+
 
 # Ruta SIN extensión (.dat y .hea deben estar en la misma carpeta)
 #ruta = r"D:\PROYECTO-IA\data\raw\00001_hr"

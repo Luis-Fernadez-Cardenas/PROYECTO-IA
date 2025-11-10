@@ -1,20 +1,32 @@
-from sys import meta_path
+
 
 import pandas as pd
 import ast
+from pathlib import Path
+PROJECT_ROOT = Path(__file__).parent.parent
 ##Funcion para cargos los datos
-def cargar_metadatos(meta_path='../data/raw/ptbxl_database.csv',
-                     scp_path='../data/raw/scp_statements.csv'):
+def cargar_metadatos(meta_path=None,
+                     scp_path=None):
 
     """
   Carga y prepara los metadatos de PTB‑XL.
   - meta_path: ruta relativa a ptbxl_database.csv
   - scp_path: ruta relativa a scp_statements.csv
-  Devuelve dos DataFrames: df_meta (metadatos) y df_scp (mapeo de códigos SCP).
+    Devuelve dos DataFrames: df_meta (metadatos) y df_scp (mapeo de códigos SCP).
     """
+    # Usar rutas por defecto basadas en la raíz del proyecto
+    if meta_path is None:
+        meta_path = PROJECT_ROOT / 'data' / 'raw' / 'ptbxl_database.csv'
+    if scp_path is None:
+        scp_path = PROJECT_ROOT / 'data' / 'raw' / 'scp_statements.csv'
+    
+    # Convertir a string para pandas
+    meta_path = str(meta_path)
+    scp_path = str(scp_path)
+    
     df_meta = pd.read_csv(meta_path)
-    df_csp = pd.read_csv(scp_path, index_col=0)
-    return df_meta, df_csp
+    df_scp = pd.read_csv(scp_path, index_col=0)
+    return df_meta, df_scp
 
 def analizar_metadatos(df_meta):
     """
@@ -33,10 +45,15 @@ def parcear_scp_codes(scp_codes_str):
     except (ValueError, SyntaxError):
         return {}
 
-def preparar_etiquetas(df_meta,df_scp,nivel='diagnostic_class'):
-    df_meta['scp_dict'] = df_meta['scp_codes'].apply(parcear_scp_codes)
+def preparar_etiquetas(df_meta,df_scp,nivel='diagnostic_class', clases_objetivo = None):
+    # Convierte scp_codes a diccionario
+    df_meta['scp_dict'] = df_meta['scp_codes'].apply(
+        lambda x: ast.literal_eval(x) if isinstance(x, str) else {}
+    )
+    # Extrae una lista de códigos SCP por registro
     df_meta['scp_code_list'] = df_meta['scp_dict'].apply(lambda d: list(d.keys()))
-    #Mapeo a nivel elegido
+
+    # Mapeo según el nivel elegido
     if nivel == 'diagnostic_class':
         mapper = df_scp['diagnostic_class']
     elif nivel == 'diagnostic_subclass':
@@ -44,10 +61,19 @@ def preparar_etiquetas(df_meta,df_scp,nivel='diagnostic_class'):
     elif nivel == 'category':
         mapper = df_scp['category']
     else:
-        raise ValueError("Nivel no reconocido")
-    df_meta['labels'] =df_meta['scp_code_list'].apply(
+        raise ValueError("nivel no válido. Usa 'diagnostic_class', 'diagnostic_subclass' o 'category'")
+
+    # Asigna etiquetas mapeadas y elimina Nones
+    df_meta['labels'] = df_meta['scp_code_list'].apply(
         lambda codes: list({mapper.get(code) for code in codes if mapper.get(code) is not None})
     )
+
+    # Si se definen clases objetivo, filtra las etiquetas por ese conjunto
+    if clases_objetivo is not None:
+        df_meta['labels'] = df_meta['labels'].apply(
+            lambda labels: [lab for lab in labels if lab in clases_objetivo]
+        )
+
     return df_meta
 def resumen_clases(df_meta):
     from collections import Counter
