@@ -4,7 +4,8 @@ import os
 import tensorflow as tf
 
 class ECGDataGenerator(tf.keras.utils.Sequence):
-    def __init__(self, data_dir, batch_size=32, shuffle=True):
+    def __init__(self, data_dir, batch_size=32, shuffle=True, **kwargs):
+        super().__init__(**kwargs)
         """
         data_dir: ruta a la carpeta del split (e.g. data/processed/train)
         """
@@ -14,13 +15,13 @@ class ECGDataGenerator(tf.keras.utils.Sequence):
         # Lee el CSV con file y labels
         self.df_labels = pd.read_csv(os.path.join(data_dir, 'labels.csv'))
         self.indexes = np.arange(len(self.df_labels))
-        self.on_epoch_end()
 
         # Construye un diccionario para codificar etiquetas a índices
         clases = sorted({lab for labs in self.df_labels['labels']
                                  for lab in eval(labs)})
         self.class2idx = {c: i for i, c in enumerate(clases)}
         self.n_classes = len(self.class2idx)
+        self.on_epoch_end()
 
     def __len__(self):
         return int(np.ceil(len(self.df_labels) / self.batch_size))
@@ -30,8 +31,7 @@ class ECGDataGenerator(tf.keras.utils.Sequence):
         batch_files = self.df_labels.iloc[batch_idxs]['file'].values
         batch_labels = self.df_labels.iloc[batch_idxs]['labels'].values
 
-        X = []
-        y = []
+        X, y = [], []
         for f, labs_str in zip(batch_files, batch_labels):
             signal = np.load(os.path.join(self.data_dir, f))
             X.append(signal)  # shape (5000, 12)
